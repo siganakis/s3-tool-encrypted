@@ -10,7 +10,11 @@ namespace com.amazon.s3
         public static string OUR_ACCESS_KEY_ID, OUR_SECRET_ACCESS_KEY;
         public static bool verbose = false;
 
-        public static SortedList GetHeaders(string acl, string filename, string storageClass)
+		//public static SortedList GetHeaders(string acl, string filename, string storageClass) {
+		//    return GetHeaders(acl, filename, storageClass, false);
+
+		//}
+        public static SortedList GetHeaders(string acl, string filename, string storageClass, bool encrypt)
         {
             SortedList headers = new SortedList();
 
@@ -19,6 +23,10 @@ namespace com.amazon.s3
 
             if (storageClass != null)
                 headers.Add("x-amz-storage-class", storageClass);
+
+			if (encrypt) {
+				headers.Add("x-amz-server-side-encryption", "AES256");
+			}
 
             string mime = GetMimeType(filename);
             if (mime != null)

@@ -16,13 +16,13 @@ namespace s3.Commands
     {
         long perChunkBytes;
         string acl;
-        bool backup, sync, big, sub, subWithDelete;
+        bool backup, sync, big, sub, subWithDelete, encrypt;
         string keyArgument, fileArgument, storageClass;
         string bucket, baseKey;
 
         protected override void Initialise(CommandLine cl)
         {
-            if (cl.args.Count != 2)
+			if (cl.args.Count != 2)
             {
                 // TODO We should probably allow multiple file names on the command line
                 if (Utils.IsLinux)
@@ -38,7 +38,9 @@ namespace s3.Commands
             backup = cl.options.ContainsKey(typeof(Backup));
             sync = cl.options.ContainsKey(typeof(Sync));
             big = cl.options.ContainsKey(typeof(Big));
-            sub = cl.options.ContainsKey(typeof(Sub));
+			sub = cl.options.ContainsKey(typeof(Sub));
+			encrypt = cl.options.ContainsKey(typeof(Encrypt));
+
             storageClass = StorageClass.GetOptionParameter(cl, typeof(StorageClass), false);
 
             if (sub)
@@ -163,7 +165,8 @@ namespace s3.Commands
                         }
                     }
 
-                    SortedList headers = AWSAuthConnection.GetHeaders(acl, file, storageClass);
+					SortedList headers = AWSAuthConnection.GetHeaders(acl, file, storageClass, encrypt);
+
                     using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read))
                     {
                         if (!big)
